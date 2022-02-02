@@ -1,7 +1,7 @@
 package cz.osu.gamingblog.models;
 
 import javax.annotation.Generated;
-import javax.persistence.metamodel.SetAttribute;
+import javax.persistence.metamodel.CollectionAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
@@ -12,7 +12,7 @@ public abstract class Category_ {
 	public static volatile SingularAttribute<Category, String> name;
 	public static volatile SingularAttribute<Category, String> description;
 	public static volatile SingularAttribute<Category, Long> id;
-	public static volatile SetAttribute<Category, Post> posts;
+	public static volatile CollectionAttribute<Category, Post> posts;
 
 	public static final String NAME = "name";
 	public static final String DESCRIPTION = "description";

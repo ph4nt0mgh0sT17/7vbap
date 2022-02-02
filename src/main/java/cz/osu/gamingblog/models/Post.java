@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Collection;
 
 @Entity
 @Table(name = "post")
@@ -31,7 +32,11 @@ public class Post {
     @Column(name = "thumbnail_url")
     private String thumbnailUrl;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-    @JoinColumn(name = "category_id")
-    private Category category;
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinTable(
+            name = "post_category",
+            joinColumns = @JoinColumn(name = "pk_post_id", referencedColumnName = "pk_post_id"),
+            inverseJoinColumns = @JoinColumn(name = "pk_category_id", referencedColumnName = "pk_category_id")
+    )
+    private Collection<Category> categories;
 }

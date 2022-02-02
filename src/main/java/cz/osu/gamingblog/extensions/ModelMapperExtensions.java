@@ -1,5 +1,6 @@
 package cz.osu.gamingblog.extensions;
 
+import cz.osu.gamingblog.converters.CategoryCollectionToCategoryResponseListConverter;
 import cz.osu.gamingblog.models.*;
 import cz.osu.gamingblog.requests.CreateCategoryRequest;
 import cz.osu.gamingblog.requests.CreatePostRequest;
@@ -7,11 +8,8 @@ import cz.osu.gamingblog.requests.RegistrationRequest;
 import cz.osu.gamingblog.responses.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.modelmapper.AbstractConverter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
-
-import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ModelMapperExtensions {
@@ -74,8 +72,9 @@ public class ModelMapperExtensions {
                 map().setHtmlContent(source.getHtmlContent());
                 map().setThumbnailUrl(source.getThumbnailUrl());
 
-                map().getCategory().setDescription(source.getCategory().getDescription());
-                map().getCategory().setName(source.getCategory().getName());
+                using(new CategoryCollectionToCategoryResponseListConverter())
+                        .map(source.getCategories())
+                        .setCategories(null);
 
                 map().getAuthor().setUsername(source.getAuthor().getUsername());
                 map().getAuthor().setFirstName(source.getAuthor().getFirstName());

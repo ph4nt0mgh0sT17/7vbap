@@ -2,6 +2,7 @@ package cz.osu.gamingblog.services;
 
 import cz.osu.gamingblog.exceptions.EntityAlreadyExistsException;
 import cz.osu.gamingblog.exceptions.EntityDoesNotExistException;
+import cz.osu.gamingblog.models.Category;
 import cz.osu.gamingblog.models.Post;
 import cz.osu.gamingblog.repositories.ICategoryRepository;
 import cz.osu.gamingblog.repositories.IPostRepository;
@@ -27,21 +28,22 @@ public class PostService implements IPostService {
     private final IUserRepository _userRepository;
     private final ICategoryRepository _categoryRepository;
     private final ModelMapper _modelMapper;
-    private final IImageService _imageService;
 
-    public PostService(IPostRepository _postRepository, ModelMapper _modelMapper,IImageService imageService,
-                       IUserRepository userRepository, ICategoryRepository categoryRepository) {
+    public PostService(IPostRepository _postRepository, ModelMapper _modelMapper, IUserRepository userRepository,
+                       ICategoryRepository categoryRepository) {
         this._postRepository = _postRepository;
         this._modelMapper = _modelMapper;
-        this._imageService = imageService;
         this._userRepository = userRepository;
         this._categoryRepository = categoryRepository;
     }
 
     @Override
     public List<PostResponse> retrieveLatestPosts(int postsNumber, String categoryName) {
+        var category = _categoryRepository.findOne(hasName(categoryName))
+                .orElseThrow(EntityDoesNotExistException::new);
+
         var latestPosts = _postRepository.retrieveLatestPosts(
-                 categoryName, PageRequest.of(0, 4)
+                category, PageRequest.of(0, 4)
         );
 
         return latestPosts.stream()
@@ -50,8 +52,11 @@ public class PostService implements IPostService {
     }
 
     public List<PostResponse> retrieveLatestPosts(int postsNumber, int skipNumber, String categoryName) {
+        var category = _categoryRepository.findOne(hasName(categoryName))
+                .orElseThrow(EntityDoesNotExistException::new);
+
         var latestPosts = _postRepository.retrieveLatestPosts(
-                categoryName,
+                category,
                 new OffsetBasedPageRequest(skipNumber, postsNumber)
         );
 
@@ -73,14 +78,15 @@ public class PostService implements IPostService {
         var author = _userRepository.findOne(hasUsername(createPostRequest.getAuthorUsername()))
                 .orElseThrow(EntityDoesNotExistException::new);
 
-        var category = _categoryRepository.findOne(hasName(createPostRequest.getCategory()))
-                .orElseThrow(EntityDoesNotExistException::new);
+        var categories = _categoryRepository.retrieveCategoriesByNames(
+                createPostRequest.getCategories()
+        );
 
         var post = _modelMapper.map(createPostRequest, Post.class);
         post.setId(0L);
         post.setThumbnailUrl("/images/thumbnails/" + createPostRequest.getImageName());
         post.setAuthor(author);
-        post.setCategory(category);
+        post.setCategories(categories);
 
         try {
             _postRepository.save(post);
@@ -94,8 +100,9 @@ public class PostService implements IPostService {
         var author = _userRepository.findOne(hasUsername(createPostRequest.getAuthorUsername()))
                 .orElseThrow(EntityDoesNotExistException::new);
 
-        var category = _categoryRepository.findOne(hasName(createPostRequest.getCategory()))
-                .orElseThrow(EntityDoesNotExistException::new);
+        var categories = _categoryRepository.retrieveCategoriesByNames(
+                createPostRequest.getCategories()
+        );
 
         var post = _modelMapper.map(createPostRequest, Post.class);
         post.setId(id);
@@ -104,7 +111,7 @@ public class PostService implements IPostService {
         post.setHtmlContent(createPostRequest.getHtmlContent());
         post.setThumbnailUrl("/images/thumbnails/" + createPostRequest.getImageName());
         post.setAuthor(author);
-        post.setCategory(category);
+        post.setCategories(categories);
 
         try {
             _postRepository.save(post);

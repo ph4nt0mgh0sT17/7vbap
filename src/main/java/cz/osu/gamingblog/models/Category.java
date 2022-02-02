@@ -1,16 +1,17 @@
 package cz.osu.gamingblog.models;
 
-import lombok.Generated;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.Set;
 
 @Entity
 @Table(name = "category")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +24,6 @@ public class Category {
     @Column(name = "description")
     private String description;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "category")
-    private Set<Post> posts;
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "categories")
+    private Collection<Post> posts;
 }

@@ -1,8 +1,8 @@
 package cz.osu.gamingblog.requests;
 
-import cz.osu.gamingblog.responses.AuthorResponse;
-import cz.osu.gamingblog.responses.CategoryResponse;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -14,6 +14,6 @@ public class CreatePostRequest {
     private String description;
     private String htmlContent;
     private String imageName;
-    private String category;
+    private List<String> categories;
     private String authorUsername;
 }
